@@ -8,7 +8,9 @@ namespace Algorithms
         public List<double> Cash = new List<double>();
         public List<double> Quantity = new List<double>();
         public List<double> QuantityHelper = new List<double>();
-        public int count = 0;
+        public double[] oddMoneyArray;
+        public double[] denominationArray;
+        public int count = 14;
         public double amount = 0;
         public double payment = 0;
         public double oddMoney = 0;
@@ -23,16 +25,18 @@ namespace Algorithms
             Cash.AddRange(valuesCash);
             Quantity.AddRange(valuesQuantity);
             QuantityHelper.AddRange(valuesQuantity);
-            count = 14;
             Start();
         }
 
         public void Start()
         {
+
+
             while (hasMoney)
             {
                 Random randomAmount = new Random();
                 amount = randomAmount.Next(50, 1000);
+                //amount = double.Parse(Console.ReadLine());
                 Console.WriteLine("Cena wynosi: {0}zł", amount);
                 amount = amount * 100;
                 Console.Write("Podaj kwotę lub sprawdź nominały: ");
@@ -51,41 +55,55 @@ namespace Algorithms
                     summary = "";
                 }
 
-                for(int i = 13; i >=0; i--)
+                oddMoneyArray = new double[(int)oddMoney + 1];
+                denominationArray = new double[(int)oddMoney + 1];
+                oddMoneyArray[0] = 0;
+
+                for (int i = 1; i < oddMoneyArray.Length; i++)
                 {
-                    while(oddMoney - (Cash[i]) >= 0 && Quantity[i] != 0)
-                    {
-                        oddMoney = oddMoney - (Cash[i]);
-                        Quantity[i]--;
-                        summary = summary + Cash[i]/100 + "zł ";
-                    }
+                    oddMoneyArray[i] = int.MaxValue;
+                    denominationArray[i] = 0;
                 }
 
-                if(oddMoney == 0)
+                for (int j = 0; j < Cash.Count; j++)
                 {
-                    Console.WriteLine("Reszta: " + summary + "\n");
-                    summary = "";
-                    for (int i = 0; i < QuantityHelper.Count; i++)
+                    int n = (int)Cash[j];
+                    for (int k = 0; k <= oddMoney - n; k++)
                     {
-                        QuantityHelper[i] = Quantity[i];
+                        if (oddMoneyArray[k] < int.MaxValue)
+                        {
+                            if (oddMoneyArray[k] + 1 < oddMoneyArray[k + n])
+                            {
+                                oddMoneyArray[k + n] = oddMoneyArray[k] + 1;
+                                denominationArray[k + n] = n;
+                            }
+                        }
                     }
+                }
+                if(denominationArray[(int)oddMoney] == 0)
+                {
+                    summary = "Brak możliwości wydania reszty";
                 }
                 else
                 {
-                    Console.WriteLine("Brak możliwosci wydania reszty.\n");
-                    for (int i = 0; i < QuantityHelper.Count; i++)
+                    int numb = (int)oddMoney;
+                    while (numb != 0)
                     {
-                        Quantity[i] = QuantityHelper[i];
+                        summary = summary + denominationArray[numb] / 100 + "zł ";
+                        numb = numb - (int)denominationArray[numb];
                     }
+
+                    Console.WriteLine(summary);
                 }
             }
+            
         }
 
         public void CheckCash()
         {
-            for(int i = 0; i < Cash.Count; i++)
+            for (int i = 0; i < Cash.Count; i++)
             {
-                Console.WriteLine(Quantity[i] + "  :  " + Cash[i]/100 + " zł");
+                Console.WriteLine(Quantity[i] + "  :  " + Cash[i] / 100 + " zł");
             }
             Console.WriteLine();
         }
