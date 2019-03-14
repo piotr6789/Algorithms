@@ -1,111 +1,154 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Algorithms
 {
-    public class ChangeMaking
+    class ChangeMaking
     {
-        public List<double> Cash = new List<double>();
-        public List<double> Quantity = new List<double>();
-        public List<double> QuantityHelper = new List<double>();
-        public double[] oddMoneyArray;
-        public double[] denominationArray;
-        public int count = 14;
-        public double amount = 0;
-        public double payment = 0;
-        public double oddMoney = 0;
-        public string check = "";
-        public string summary = "";
-        public bool hasMoney = true;
+        public static double payment = 0;
+        public static string summary = "";
+        public static double amount = 0;
+        public static int[] coins = { 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000 };
+        public static int[] limits = { 123, 55, 54, 32, 12, 34, 22, 11, 9, 8, 7, 6, 5, 4 };
+        public static bool hasKey = true;
 
-        public ChangeMaking()
+        public static void Start()
         {
-            double[] valuesCash = { 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000 };
-            double[] valuesQuantity = { 10, 20, 13, 15, 15, 12, 8, 9, 7, 5, 1, 2, 5, 3 };
-            Cash.AddRange(valuesCash);
-            Quantity.AddRange(valuesQuantity);
-            QuantityHelper.AddRange(valuesQuantity);
-            Start();
-        }
-
-        public void Start()
-        {
-
-
-            while (hasMoney)
+            while (hasKey)
             {
+                summary = "";
                 Random randomAmount = new Random();
-                amount = randomAmount.Next(50, 1000);
+                payment = randomAmount.Next(50, 1000);
                 //amount = double.Parse(Console.ReadLine());
-                Console.WriteLine("Cena wynosi: {0}zł", amount);
-                amount = amount * 100;
-                Console.Write("Podaj kwotę lub sprawdź nominały: ");
-                check = Console.ReadLine();
+                Console.WriteLine("Cena wynosi: {0}zł", payment);
+                Console.Write("Podaj kwotę: ");
+                amount = (double.Parse(Console.ReadLine()) - payment) * 100;
 
-                if (check.Equals("sprawdz"))
+
+                int[][] coinsUsed = new int[(int)amount + 1][];
+                for (int i = 0; i <= amount; ++i)
                 {
-                    CheckCash();
-                    continue;
-                }
-                else
-                {
-                    payment = double.Parse(check);
-                    payment = payment * 100;
-                    oddMoney = payment - amount;
-                    summary = "";
+                    coinsUsed[i] = new int[coins.Length];
                 }
 
-                oddMoneyArray = new double[(int)oddMoney + 1];
-                denominationArray = new double[(int)oddMoney + 1];
-                oddMoneyArray[0] = 0;
-
-                for (int i = 1; i < oddMoneyArray.Length; i++)
+                int[] minCoins = new int[(int)amount + 1];
+                for (int i = 1; i <= amount; ++i)
                 {
-                    oddMoneyArray[i] = int.MaxValue;
-                    denominationArray[i] = 0;
+                    minCoins[i] = int.MaxValue - 1;
                 }
 
-                for (int j = 0; j < Cash.Count; j++)
+                int[] limitsCopy = new int[limits.Length];
+                limits.CopyTo(limitsCopy, 0);
+
+                for (int i = 0; i < coins.Length; ++i)
                 {
-                    int n = (int)Cash[j];
-                    for (int k = 0; k <= oddMoney - n; k++)
+                    while (limitsCopy[i] > 0)
                     {
-                        if (oddMoneyArray[k] < int.MaxValue)
+                        for (int j = (int)amount; j >= 0; --j)
                         {
-                            if (oddMoneyArray[k] + 1 < oddMoneyArray[k + n])
+                            int currAmount = j + coins[i];
+                            if (currAmount <= amount)
                             {
-                                oddMoneyArray[k + n] = oddMoneyArray[k] + 1;
-                                denominationArray[k + n] = n;
+                                if (minCoins[currAmount] > minCoins[j] + 1)
+                                {
+                                    minCoins[currAmount] = minCoins[j] + 1;
+
+                                    coinsUsed[j].CopyTo(coinsUsed[currAmount], 0);
+                                    coinsUsed[currAmount][i] += 1;
+                                }
                             }
+                        }
+
+                        limitsCopy[i] -= 1;
+                    }
+                }
+
+                if (minCoins[(int)amount] == int.MaxValue - 1)
+                {
+                    Console.WriteLine("Brak możliwości wydania reszty");
+                }
+                for (int i = 0; i < limits.Length; i++)
+                {
+                    while (coinsUsed[(int)amount][i] >= 0)
+                    {
+                        if (i == 0)
+                        {
+                            summary = summary + "0.01" + "zł ";
+                            coinsUsed[(int)amount][i]--;
+                        }
+                        if (i == 1)
+                        {
+                            summary = summary + "0.02" + "zł ";
+                            coinsUsed[(int)amount][i]--;
+                        }
+                        if (i == 2)
+                        {
+                            summary = summary + "0.05" + "zł ";
+                            coinsUsed[(int)amount][i]--;
+                        }
+                        if (i == 3)
+                        {
+                            summary = summary + "0.1" + "zł ";
+                            coinsUsed[(int)amount][i]--;
+                        }
+                        if (i == 4)
+                        {
+                            summary = summary + "0.2" + "zł ";
+                            coinsUsed[(int)amount][i]--;
+                        }
+                        if (i == 5)
+                        {
+                            summary = summary + "0.5" + "zł ";
+                            coinsUsed[(int)amount][i]--;
+                        }
+                        if (i == 6)
+                        {
+                            summary = summary + "1" + "zł ";
+                            coinsUsed[(int)amount][i]--;
+                        }
+                        if (i == 7)
+                        {
+                            summary = summary + "2" + "zł ";
+                            coinsUsed[(int)amount][i]--;
+                        }
+                        if (i == 8)
+                        {
+                            summary = summary + "5" + "zł ";
+                            coinsUsed[(int)amount][i]--;
+                        }
+                        if (i == 9)
+                        {
+                            summary = summary + "10" + "zł ";
+                            coinsUsed[(int)amount][i]--;
+                        }
+                        if (i == 10)
+                        {
+                            summary = summary + "20" + "zł ";
+                            coinsUsed[(int)amount][i]--;
+                        }
+                        if (i == 11)
+                        {
+                            summary = summary + "50" + "zł ";
+                            coinsUsed[(int)amount][i]--;
+                        }
+                        if (i == 12)
+                        {
+                            summary = summary + "100" + "zł ";
+                            coinsUsed[(int)amount][i]--;
+                        }
+                        if (i == 13)
+                        {
+                            summary = summary + "200" + "zł ";
+                            coinsUsed[(int)amount][i]--;
                         }
                     }
                 }
-                if(denominationArray[(int)oddMoney] == 0)
-                {
-                    summary = "Brak możliwości wydania reszty";
-                }
-                else
-                {
-                    int numb = (int)oddMoney;
-                    while (numb != 0)
-                    {
-                        summary = summary + denominationArray[numb] / 100 + "zł ";
-                        numb = numb - (int)denominationArray[numb];
-                    }
 
-                    Console.WriteLine(summary);
-                }
+                Console.WriteLine(summary);
             }
-            
-        }
-
-        public void CheckCash()
-        {
-            for (int i = 0; i < Cash.Count; i++)
-            {
-                Console.WriteLine(Quantity[i] + "  :  " + Cash[i] / 100 + " zł");
-            }
-            Console.WriteLine();
         }
     }
 }

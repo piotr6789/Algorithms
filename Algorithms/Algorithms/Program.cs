@@ -10,7 +10,7 @@ namespace Algorithms
     {
         static void Main(string[] args)
         {
-            ChangeMaking changeMaking = new ChangeMaking();
+            ChangeMaking.Start();
         }
     }
 }
