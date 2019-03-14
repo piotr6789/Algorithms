@@ -15,14 +15,15 @@ namespace Algorithms
         public static int[] limits = { 2, 32, 23, 32, 53, 32, 33, 21, 22, 15, 12, 10, 5, 4 };
         public static bool hasCoin = true;
 
-        public static void Dynamic()
+        public static void Start()
         {
             while (hasCoin)
             {
                 summary = "";
                 Random randomAmount = new Random();
                 payment = randomAmount.Next(50, 1000);
-                //amount = double.Parse(Console.ReadLine());
+                //payment = double.Parse(Console.ReadLine());
+                //CheckCash();
                 Console.WriteLine("Cena wynosi: {0}zł", payment);
                 Console.Write("Podaj kwotę: ");
                 double check = double.Parse(Console.ReadLine());
@@ -32,40 +33,40 @@ namespace Algorithms
 
 
                 int[][] coinsUsed = new int[(int)amount + 1][];
-                for (int i = 0; i <= amount; ++i)
+                for (int i = 0; i <= amount; i++)
                 {
                     coinsUsed[i] = new int[coins.Length];
                 }
 
                 int[] minCoins = new int[(int)amount + 1];
-                for (int i = 1; i <= amount; ++i)
+                for (int i = 1; i <= amount; i++)
                 {
                     minCoins[i] = int.MaxValue - 1;
                 }
 
-                int[] limitsCopy = new int[limits.Length];
-                limits.CopyTo(limitsCopy, 0);
+                int[] limitsHelper = new int[limits.Length];
+                limits.CopyTo(limitsHelper, 0);
 
-                for (int i = 0; i < coins.Length; ++i)
+                for (int i = 0; i < coins.Length; i++)
                 {
-                    while (limitsCopy[i] > 0)
+                    while (limitsHelper[i] > 0)
                     {
-                        for (int j = (int)amount; j >= 0; --j)
+                        for (int j = (int)amount; j >= 0; j--)
                         {
-                            int currAmount = j + coins[i];
-                            if (currAmount <= amount)
+                            int currentAmount = j + coins[i];
+                            if (currentAmount <= amount)
                             {
-                                if (minCoins[currAmount] > minCoins[j] + 1)
+                                if (minCoins[currentAmount] > minCoins[j] + 1)
                                 {
-                                    minCoins[currAmount] = minCoins[j] + 1;
+                                    minCoins[currentAmount] = minCoins[j] + 1;
 
-                                    coinsUsed[j].CopyTo(coinsUsed[currAmount], 0);
-                                    coinsUsed[currAmount][i] += 1;
+                                    coinsUsed[j].CopyTo(coinsUsed[currentAmount], 0);
+                                    coinsUsed[currentAmount][i] += 1;
                                 }
                             }
                         }
 
-                        limitsCopy[i] -= 1;
+                        limitsHelper[i] -= 1;
                     }
                 }
 
@@ -73,7 +74,7 @@ namespace Algorithms
                 {
                     Console.WriteLine("Brak możliwości wydania reszty");
                 }
-                for (int i = 0; i < limits.Length; i++)
+                for (int i = limits.Length - 1; i >= 0; i--)
                 {
                     while (coinsUsed[(int)amount][i] > 0)
                     {
@@ -164,7 +165,15 @@ namespace Algorithms
                     }
                 }
 
-                Console.WriteLine(summary);
+                Console.WriteLine(summary + "\n");
+            }
+        }
+
+        public static void CheckCash()
+        {
+            for (int i = 0; i < limits.Length; i++)
+            {
+                Console.WriteLine(limits[i] + " : " + (double)coins[i]/100 + "zł");
             }
         }
     }
